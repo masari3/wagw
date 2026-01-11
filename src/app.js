@@ -6,13 +6,27 @@ const apiRoutes = require('./routes/api');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Middleware
 app.use(express.json());
 
-;(async () => {
+async function startServer() {
+  try {
+    console.log('[WA] Inisialisasi WhatsApp...')
     const wa = await initWhatsApp()
-    app.use('/api', apiRoutes(wa))
-})();
+    console.log('[WA] WhatsApp already initialized, register API routes')
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+    // Register API routes
+    app.use('/api', apiRoutes(wa))
+
+    app.listen(PORT, () => {
+      console.log(`[Server] WA Gateway running on port ${PORT}`)
+    })
+
+  } catch (err) {
+    console.error('[Error] Failed running gateway:', err)
+    process.exit(1)
+  }
+}
+
+// Jalankan server
+startServer()
